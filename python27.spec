@@ -1,11 +1,11 @@
 # To Build:
 #
+# sudo yum -y groupinstall "Development tools"
 # sudo yum -y install rpmdevtools && rpmdev-setuptree
-# sudo yum -y install tk-devel tcl-devel expat-devel db4-devel gdbm-devel sqlite-devel bzip2-devel openssl-devel ncurses-devel readline-devel
+# sudo yum -y install zlib-devel libpcap-devel xz-devel tk-devel tcl-devel expat-devel db4-devel gdbm-devel sqlite-devel bzip2-devel openssl-devel ncurses-devel readline-devel
 # wget https://raw.github.com/nmilford/rpm-python27/master/python27.spec -O ~/rpmbuild/SPECS/python27.spec
-# wget http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz -O ~/rpmbuild/SOURCES/Python-2.7.6.tgz
+# wget http://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz -O ~/rpmbuild/SOURCES/Python-2.7.9.tgz
 # QA_RPATHS=$[ 0x0001|0x0010 ] rpmbuild -bb ~/rpmbuild/SPECS/python27.spec
-
 
 ##########################
 #  User-modifiable configs
@@ -16,9 +16,9 @@
 
 #  Define Constants
 %define name python27
-%define version 2.7.6
+%define version 2.7.9
 %define libvers 2.7
-%define release 1
+%define release 2
 %define __prefix /usr
 
 
@@ -54,8 +54,8 @@
 
 
 #  Build shared libraries or .a library?
-%define config_sharedlib yes
 %define config_sharedlib no
+%define config_sharedlib yes
 
 
 #  Location of the HTML directory to place tho documentation in?
@@ -175,6 +175,12 @@ formats.
 %endif
 
 %changelog
+* Sun Apr 05 2015 Johan Ryberg <johan@securit.se> [2.7.9-2]
+- Fixed ldconfig to run after install
+
+* Sun Apr 05 2015 Johan Ryberg <johan@securit.se> [2.7.9-1]
+- Updated to 2.7.9
+
 * Mon Apr 14 2014 Cornfeedhobo <cornfeedhobo@fuzzlabs.org> [2.7.6-1]
 - Updated to 2.7.6
 - Fixed abi dependancy notice
@@ -381,6 +387,17 @@ done
 [ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
 rm -f mainpkg.files tools.files
 
+########
+# POST
+########
+%post
+/sbin/ldconfig
+
+########
+# POSTUN
+########
+%postun
+/sbin/ldconfig
 
 ########
 #  FILES
@@ -389,6 +406,7 @@ rm -f mainpkg.files tools.files
 %defattr(-,root,root)
 %doc Misc/README Misc/cheatsheet Misc/Porting
 %doc LICENSE Misc/ACKS Misc/HISTORY Misc/NEWS
+%doc %attr(0444,root,root) /usr/share/man/man1/python2.7.1.gz
 
 %{__prefix}/%{libdirname}/python%{libvers}/lib-dynload/
 %{__prefix}/%{libdirname}/python%{libvers}/lib2to3/tests/data/
